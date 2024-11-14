@@ -63,4 +63,5 @@ docker run --network="host" test-coworking-analytics
 ```
 
 # Set up Continuous Integration with CodeBuild
-
+- Create ECR
+- Create CodeBuild
