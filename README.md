@@ -71,8 +71,13 @@ Add permission 'FullECRAccess' policy to IAM role of CodeBuild to allow access E
 
 # Configure ENV 
 ```bash
-kubectl apply -f deployment/pvc.yaml
-kubectl apply -f deployment/pv.yaml
+kubectl apply -f deployment/configmap.yaml
+kubectl apply -f deployment/mysecret.yaml.yaml
+```
+
+# Verify DB Password
+```bash
+kubectl get secret mysecret -o jsonpath="{.data.DB_PASSWORD}" | base64 --decode
 ```
 
 # Deploy application
