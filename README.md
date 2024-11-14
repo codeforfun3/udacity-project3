@@ -63,6 +63,6 @@ docker run --network="host" test-coworking-analytics
 ```
 
 # Set up Continuous Integration with CodeBuild
-1. Create CodeBuild
-    - Add permission 'FullECRAccess' policy to IAM role of CodeBuild to allow access ECR
+- Create ECR repository: coworking
+- Create CodeBuild: Add permission 'FullECRAccess' policy to IAM role of CodeBuild to allow access ECR, Add trigger Merge event 
 
