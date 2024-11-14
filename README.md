@@ -1,4 +1,4 @@
-## Getting Started
+## Create cluster and setup DB service
 
 # create cluster
 ```bash
@@ -62,7 +62,32 @@ docker build -t test-coworking-analytics .
 docker run --network="host" test-coworking-analytics
 ```
 
-# Set up Continuous Integration with CodeBuild
-- Create ECR repository: coworking
-- Create CodeBuild: Add permission 'FullECRAccess' policy to IAM role of CodeBuild to allow access ECR, Add trigger Merge event 
+## Setup Continuous Integration with CodeBuild and Deploy to EKS
+# Create ECR repository
+coworking
 
+# Create CodeBuild 
+Add permission 'FullECRAccess' policy to IAM role of CodeBuild to allow access ECR, Add trigger Merge event 
+
+# Configure ENV 
+```bash
+kubectl apply -f deployment/pvc.yaml
+kubectl apply -f deployment/pv.yaml
+```
+
+# Deploy application
+```bash
+kubectl apply -f deployment/coworking.yaml
+```
+
+# CloudWatch - Log
+```bash
+aws iam attach-role-policy \
+--role-name eksctl-my-cluster-nodegroup-my-nod-NodeInstanceRole-jKrgIeJMpgSK \
+--policy-arn arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy --profile udacity-cloud
+
+aws eks create-addon --addon-name amazon-cloudwatch-observability --cluster-name my-cluster --profile udacity-cloud
+
+```
+# Screenshots
+Check screenshots folder
