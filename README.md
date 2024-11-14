@@ -1,4 +1,4 @@
-## Create cluster and setup DB service
+## Project 3
 
 # create cluster
 ```bash
@@ -20,24 +20,23 @@ kubectl apply -f deployment/postgresql-deployment.yaml
 kubectl apply -f deployment/postgresql-service.yaml
 ```
 
+# Create env
+```bash
+kubectl apply -f deployment/configmap.yaml
+kubectl apply -f deployment/mysecret.yaml.yaml
+```
+
 # setup port-forwarding from local:5433 to postgresql-service:5432
 ```bash
 kubectl port-forward service/postgresql-service 5433:5432 &
 ```
 
-# set DB env variables
-
-```bash
-export DB_PASSWORD=mypassword
-export DB_USERNAME=myuser
-export DB_HOST="127.0.0.1"
-export DB_NAME="mydatabase"
-export DB_PORT=5433
-```
-
 # Create table and insert data
 ```bash
-PGPASSWORD="$DB_PASSWORD" psql --host 127.0.0.1 -U myuser -d mydatabase -p 5433 < db/<files.sql>
+export DB_PASSWORD=`kubectl get secret mysecret -o jsonpath="{.data.DB_PASSWORD}" | base64 --decode`
+PGPASSWORD="$DB_PASSWORD" psql --host 127.0.0.1 -U myuser -d mydatabase -p 5433 < db/1_create_tables.sql
+PGPASSWORD="$DB_PASSWORD" psql --host 127.0.0.1 -U myuser -d mydatabase -p 5433 < db/2_seed_users.sql
+PGPASSWORD="$DB_PASSWORD" psql --host 127.0.0.1 -U myuser -d mydatabase -p 5433 < db/3_seed_tokens.sql
 ```
 
 # connect db using port forwarding
@@ -45,40 +44,11 @@ PGPASSWORD="$DB_PASSWORD" psql --host 127.0.0.1 -U myuser -d mydatabase -p 5433 
 PGPASSWORD="$DB_PASSWORD" psql --host 127.0.0.1 -U myuser -d mydatabase -p 5433
 ```
 
-# build app locally 
-```bash
-apt update -y && apt install build-essential libpq-dev -y
-pip install --upgrade pip setuptools wheel
-pip install -r requirements.txt
-python app.py
-
-curl 127.0.0.1:5153/api/reports/daily_usage
-curl 127.0.0.1:5153/api/reports/user_visits
-```
-
-# build app with docker
-```bash
-docker build -t test-coworking-analytics .
-docker run --network="host" test-coworking-analytics
-```
-
-## Setup Continuous Integration with CodeBuild and Deploy to EKS
 # Create ECR repository
 coworking
 
 # Create CodeBuild 
 Add permission 'FullECRAccess' policy to IAM role of CodeBuild to allow access ECR, Add trigger Merge event 
-
-# Configure ENV 
-```bash
-kubectl apply -f deployment/configmap.yaml
-kubectl apply -f deployment/mysecret.yaml.yaml
-```
-
-# Verify DB Password
-```bash
-kubectl get secret mysecret -o jsonpath="{.data.DB_PASSWORD}" | base64 --decode
-```
 
 # Deploy application
 ```bash
